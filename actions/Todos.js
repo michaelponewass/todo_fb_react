@@ -11,6 +11,15 @@ export function getMeals() {
         }).catch(reject)).catch((err) => { throw err.message; });
 }
 
+export function getTodos() {
+    if (Firebase === null) return () => new Promise(resolve => resolve());
+    return new Promise((resolve, reject) => FirebaseRef.child('todos').once('value')
+        .then((snapshot) => {
+            const data = snapshot.val() || [];
+            return resolve(data);
+        }).catch(reject)).catch((err) => { throw err.message; });
+}
+
 export function addTodo(task) {
     if (Firebase === null) return () => new Promise(resolve => resolve());
     return new Promise((resolve, reject) => FirebaseRef.child('todos').set(task)

@@ -1,65 +1,79 @@
-import { Button, ThemeProvider } from 'react-native-elements';
-import React, {useState} from 'react';
-import {
-    StyleSheet,
-    Text,
-    View,
-    TextInput,
-    TouchableOpacity,
-    ShadowPropTypesIOS,
-    ScrollView
-} from 'react-native';
+import {ThemeProvider} from 'react-native-elements';
+import React, {useEffect, useState} from 'react';
+import {ScrollView, ShadowPropTypesIOS, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 
 import Task from './Task'
-import { getMeals, addTodo } from './actions/Todos';
+import {addTodo, getTodos} from './actions/Todos';
 
 
-import {FirebaseRef} from "./lib/firebase";
 const App = () => {
+    return (
+        <ThemeProvider>
+            <View style={styles.container}>
+                <Button
+                    title="Todos" onPress={() => switchScreen()}
+                />
+            </View>
+        </ThemeProvider>
+    );
+
+    switchScreen = () => {
+
+    }
+
+}
+
+
+const TodoScreen = () => {
 
     const [value, setValue] = useState('')
     const [todos, setTodos] = useState([])
 
+    useEffect(() => {
+        getTodos().then((data) => {
+            if (data.length > 0) {
+                setTodos(data);
+                //console.log("data ist: " + JSON.stringify(data));
+            }
+        });
+    }, []);
+
+    updateTodos = (data) => {
+        addTodo(data).then((success) => {
+            //console.log("success added a new one: " + JSON.stringify(data));
+        });
+    }
+
     handleAddTodo = () => {
-        let task={text: value, key: Date.now(), checked: false};
+        console.log("handle addToDo fired... Data: " + value);
+        let task = {text: value, key: Date.now(), checked: false};
         if (value.length > 0) {
             setTodos([...todos, task])
             setValue('')
+            updateTodos([...todos, task]);
         }
-        addTodo(task).then((success) => {
-            console.log("success added: "+ JSON.stringify(success));
-        });
-
-/*
-
-        getMeals().then((data) => {
-        console.log("Meals: "+JSON.stringify(data))
-    })
-*/
-
     }
-
     handleDeleteTodo = (id) => {
-        setTodos(
-            todos.filter((todo) => {
-                if (todo.key !== id) return true
-            })
-        )
+        const filteredData = todos.filter((todo) => {
+            if (todo.key !== id) return true
+        })
+        setTodos(filteredData)
+        updateTodos(filteredData);
     }
-
     handleChecked = (id) => {
-        setTodos(
+        const filteredData =
             todos.map((todo) => {
                 if (todo.key === id) todo.checked = !todo.checked;
                 return todo;
             })
-        )
-    }
+        setTodos(filteredData)
+        updateTodos(filteredData);
+    };
     return (
         <ThemeProvider>
             <View style={styles.container}>
-                <Text style={{marginTop: '10%', fontSize: 16, color: 'black'}}>Today</Text>
+                <Text style={{marginTop: '10%', fontSize: 16, color: 'black'}}>Heute</Text>
                 <View style={styles.textInputContainer}>
                     <TextInput
                         style={styles.textInput}
@@ -89,9 +103,9 @@ const App = () => {
                 </ScrollView>
             </View>
         </ThemeProvider>
-    )
+    );
 }
-export default App
+export default App, TodoScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
