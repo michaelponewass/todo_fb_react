@@ -1,4 +1,4 @@
-import {ThemeProvider} from 'react-native-elements';
+import {Slider, ThemeProvider} from 'react-native-elements';
 import React, {useEffect, useState} from 'react';
 import {ScrollView, ShadowPropTypesIOS, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
@@ -6,24 +6,25 @@ import Icon from 'react-native-vector-icons/Feather';
 import Task from './Task'
 import {addTodo, getTodos} from './actions/Todos';
 
+import {createAppContainer, createBottomTabNavigator} from 'react-navigation';
 
-const App = () => {
+
+const SliderScreen = () => {
+    const [sliderValue, setSliderValue] = useState(0)
+    handleEmotionUpdate = () => {
+        console.log("handleEmotionUpdate: Number: " + sliderValue);
+    }
     return (
         <ThemeProvider>
-            <View style={styles.container}>
-                <Button
-                    title="Todos" onPress={() => switchScreen()}
+            <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'center'}}>
+                <Slider minimumValue={1} maximumValue={10} step={1} value={sliderValue}
+                    onSlidingComplete={handleEmotionUpdate()} onValueChange={value => setSliderValue(value)}
                 />
+                <Text style={{marginTop: '10%', fontSize: 16, color: 'black'}}>Value: {sliderValue}</Text>
             </View>
         </ThemeProvider>
     );
-
-    switchScreen = () => {
-
-    }
-
 }
-
 
 const TodoScreen = () => {
 
@@ -105,7 +106,14 @@ const TodoScreen = () => {
         </ThemeProvider>
     );
 }
-export default App, TodoScreen;
+
+const TabNavigator = createBottomTabNavigator({
+    Home: TodoScreen,
+    Slider: SliderScreen,
+});
+
+export default createAppContainer(TabNavigator);
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
