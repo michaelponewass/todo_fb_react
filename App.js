@@ -2,7 +2,7 @@ import {Slider, ThemeProvider} from 'react-native-elements';
 import React, {useEffect, useState} from 'react';
 import {ScrollView, ShadowPropTypesIOS, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-
+import SwitchSelector from "react-native-switch-selector";
 import Task from './Task'
 import {addTodo, getTodos} from './actions/Todos';
 
@@ -16,11 +16,45 @@ const SliderScreen = () => {
     }
     return (
         <ThemeProvider>
+
+
+
+
             <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'center'}}>
                 <Slider minimumValue={1} maximumValue={10} step={1} value={sliderValue}
                     onSlidingComplete={handleEmotionUpdate()} onValueChange={value => setSliderValue(value)}
                 />
                 <Text style={{marginTop: '10%', fontSize: 16, color: 'black'}}>Value: {sliderValue}</Text>
+            </View>
+        </ThemeProvider>
+    );
+}
+
+const SwitchSelectorScreen = () => {
+    const options = [
+        { label: "1", value: "1" },
+        { label: "2", value: "2" },
+        { label: "3", value: "3" },
+        { label: "4", value: "4" },
+        { label: "5", value: "5" },
+        { label: "6", value: "6" },
+        { label: "7", value: "7" },
+        { label: "8", value: "8" },
+        { label: "9", value: "9" },
+        { label: "10", value: "10" },
+    ];
+    const [switchValue, setSwitchValue] = useState(0)
+    handleEmotionUpdate = () => {
+        console.log("handleEmotionUpdate: Number: " + switchValue);
+    }
+    return (
+        <ThemeProvider>
+            <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'center'}}>
+                <SwitchSelector
+                    options={options}
+                    initial={0}
+                    onPress={value => setSwitchValue(value)}
+                />
             </View>
         </ThemeProvider>
     );
@@ -109,7 +143,7 @@ const TodoScreen = () => {
 
 const TabNavigator = createBottomTabNavigator({
     Home: TodoScreen,
-    Slider: SliderScreen,
+    Switch: SwitchSelectorScreen,
 });
 
 export default createAppContainer(TabNavigator);
