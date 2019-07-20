@@ -1,34 +1,16 @@
-import {Slider, ThemeProvider} from 'react-native-elements';
+import {ThemeProvider} from 'react-native-elements';
 import React, {useEffect, useState} from 'react';
 import {ScrollView, ShadowPropTypesIOS, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import SwitchSelector from "react-native-switch-selector";
 import Task from './Task'
-import {addTodo, getTodos} from './actions/Todos';
+import {addTodo, getTodos, addEnumber, getEnumbers} from './actions/Todos';
+import { VictoryBar, VictoryChart, VictoryTheme } from "victory-native";
+
 
 import {createAppContainer, createBottomTabNavigator} from 'react-navigation';
 
 
-const SliderScreen = () => {
-    const [sliderValue, setSliderValue] = useState(0)
-    handleEmotionUpdate = () => {
-        console.log("handleEmotionUpdate: Number: " + sliderValue);
-    }
-    return (
-        <ThemeProvider>
-
-
-
-
-            <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'center'}}>
-                <Slider minimumValue={1} maximumValue={10} step={1} value={sliderValue}
-                    onSlidingComplete={handleEmotionUpdate()} onValueChange={value => setSliderValue(value)}
-                />
-                <Text style={{marginTop: '10%', fontSize: 16, color: 'black'}}>Value: {sliderValue}</Text>
-            </View>
-        </ThemeProvider>
-    );
-}
 
 const SwitchSelectorScreen = () => {
     const options = [
@@ -44,17 +26,42 @@ const SwitchSelectorScreen = () => {
         { label: "10", value: "10" },
     ];
     const [switchValue, setSwitchValue] = useState(0)
-    handleEmotionUpdate = () => {
-        console.log("handleEmotionUpdate: Number: " + switchValue);
+    const [feels, setFeels] = useState([])
+
+    handleEmotionUpdate = (value) => {
+        setSwitchValue(value);
+        let currentDate = Date.now();
+        let feel={feel : value, date : currentDate}
+        setFeels([...feels, feel])
+        addEnumber([...feels, feel]);
+        console.log("handleff EmotionUpdate: Number: " + value + " Date: "+currentDate);
     }
+
+    useEffect(() => {
+        getEnumbers().then((data) => {
+            if (data.length > 0) {
+                const convData = data.map((feel, index, array) => {
+                    return { ...feel, dateasdate : new Date(feel.date) }
+                });
+                setFeels(convData);
+                //console.log("data ist: " + JSON.stringify(convData));
+            }
+        });
+    }, []);
+
+
     return (
         <ThemeProvider>
             <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'center'}}>
+                <VictoryChart width={350} theme={VictoryTheme.material}>
+                    <VictoryBar data={feels} x="dateasdate" y="feel" />
+                </VictoryChart>
                 <SwitchSelector
                     options={options}
                     initial={0}
-                    onPress={value => setSwitchValue(value)}
+                    onPress={value => handleEmotionUpdate(value)}
                 />
+
             </View>
         </ThemeProvider>
     );

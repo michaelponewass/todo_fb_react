@@ -15,11 +15,13 @@
     "react-dom": "^16.8.6",
     "react-native": "https://github.com/expo/react-native/archive/sdk-33.0.0.tar.gz",
     "react-native-elements": "^1.1.0",
+    "react-native-svg": "^9.5.3",
     "react-native-switch-selector": "^1.1.14",
     "react-native-vector-icons": "^6.5.0",
     "react-native-web": "^0.11.4",
     "react-navigation": "^3.11.0",
-    "save-dev": "^2.0.0"
+    "save-dev": "^2.0.0",
+    "victory-native": "^32.0.2"
   },
   "devDependencies": {
     "babel-preset-expo": "^5.1.1"
