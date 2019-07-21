@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import SwitchSelector from "react-native-switch-selector";
 import Task from './Task'
 import {addTodo, getTodos, addEnumber, getEnumbers} from './actions/Todos';
-import { VictoryBar, VictoryChart, VictoryTheme } from "victory-native";
+import { VictoryLine, VictoryScatter, VictoryChart, VictoryTheme } from "victory-native";
 
 
 import {createAppContainer, createBottomTabNavigator} from 'react-navigation';
@@ -32,17 +32,20 @@ const SwitchSelectorScreen = () => {
         setSwitchValue(value);
         let currentDate = Date.now();
         let feel={feel : value, date : currentDate}
-        setFeels([...feels, feel])
+        setFeels(getConvData([...feels, feel]))
         addEnumber([...feels, feel]);
         console.log("handleff EmotionUpdate: Number: " + value + " Date: "+currentDate);
+    }
+    function getConvData(data) {
+        return data.map((feel, index, array) => {
+            return {...feel, dateasdate: new Date(feel.date)}
+        });
     }
 
     useEffect(() => {
         getEnumbers().then((data) => {
             if (data.length > 0) {
-                const convData = data.map((feel, index, array) => {
-                    return { ...feel, dateasdate : new Date(feel.date) }
-                });
+                const convData = getConvData(data);
                 setFeels(convData);
                 //console.log("data ist: " + JSON.stringify(convData));
             }
@@ -53,9 +56,16 @@ const SwitchSelectorScreen = () => {
     return (
         <ThemeProvider>
             <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'center'}}>
-                <VictoryChart width={350} theme={VictoryTheme.material}>
-                    <VictoryBar data={feels} x="dateasdate" y="feel" />
+                <VictoryChart  theme={VictoryTheme.material}>
+                    <VictoryScatter
+                        style={{data: {fill: 'green'}}}
+                        size={7}
+                        data={feels} x="dateasdate" y="feel"
+                    />
+                    <VictoryLine sortKey={2}  data={feels} x="dateasdate" y="feel" />
+
                 </VictoryChart>
+
                 <SwitchSelector
                     options={options}
                     initial={0}
