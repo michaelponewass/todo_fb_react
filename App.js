@@ -1,11 +1,21 @@
-import {Header, ThemeProvider} from 'react-native-elements';
+import { Platform } from 'react-native';
+import { Card, Header, colors, ThemeProvider } from 'react-native-elements';
 import React, {useEffect, useState} from 'react';
-import {ScrollView, ShadowPropTypesIOS, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Dimensions, ScrollView, ShadowPropTypesIOS, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import SwitchSelector from "react-native-switch-selector";
 import Task from './Task'
 import {addTodo, getTodos, addEnumber, getEnumbers} from './actions/Todos';
 import {VictoryLine, VictoryBar, VictoryScatter, VictoryChart, VictoryTheme, VictoryZoomContainer} from "victory-native";
+
+const theme = {
+    colors: {
+        ...Platform.select({
+            default: colors.platform.android,
+            ios: colors.platform.ios,
+        }),
+    },
+};
 
 
 import {createAppContainer, createBottomTabNavigator} from 'react-navigation';
@@ -14,25 +24,27 @@ import {createAppContainer, createBottomTabNavigator} from 'react-navigation';
 
 const SwitchSelectorScreen = () => {
     const options = [
-
-        { label: "1", value: "Oh Schreck!" },
-        { label: "2", value: "Schlecht" },
-        { label: "3", value: "Naja" },
-        { label: "4", value: "Ok" },
-        { label: "5", value: "Gut" },
-        { label: "6", value: "Hmm.." },
-        { label: "7", value: "Sehr gut" },
-        { label: "8", value: "Wow" },
-        { label: "9", value: "Großartig" },
-        { label: "10", value: "Unglaublich" },
-
 /*
+
+        { label: "Oh Schreck!", value: "1" },
+        { label: "Schlecht", value: "2" },
+        { label: "Naja", value: "3" },
+        { label: "Ok", value: "4" },
+        { label: "Gut", value: "5" },
+        { label: "Hmm..", value: "6" },
+        { label: "Sehr gut", value: "7" },
+        { label: "Wow", value: "8" },
+        { label: "Großartig", value: "9" },
+        { label: "Unglaublich", value: "10" },
+*/
+
         { label: "1", value: "1" },
         { label: "2", value: "2" },
         { label: "3", value: "3" },
         { label: "4", value: "4" },
         { label: "5", value: "5" },
         { label: "6", value: "6" },
+/*
         { label: "7", value: "7" },
         { label: "8", value: "8" },
         { label: "9", value: "9" },
@@ -67,53 +79,57 @@ const SwitchSelectorScreen = () => {
             }
         });
     }, []);
-    const windowSize = Dimension.get("window");
+    const windowSize = Dimensions.get("window");
     const [zoom, setZoom] = useState({});
     const [brush, setBrush] = useState(0);
 
     return (
-        <ThemeProvider>
+        <ThemeProvider theme={theme}>
             <Header
-                leftComponent={{ icon: 'menu', color: '#fff' }}
-                centerComponent={{ text: 'MY TITLE', style: { color: '#fff' } }}
-                rightComponent={{ icon: 'home', color: '#fff' }}
+                centerComponent={{ text: 'Emotionale Nummer', style: { color: '#fff' } }}
+                rightComponent={{ icon: 'add', color: '#fff' }}
             />
-
             <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'center'}}>
-
-                <Text h2>Wie geht's Dir?</Text>
-
-                <SwitchSelector
-                    options={options}
-                    initial={0}
-                    onPress={value => handleEmotionUpdate(value)}
-                />
-
+                <Card title='Michael'>
+                    <Text h1>Wie ist Deine Stimmung als Zahl ausgedrückt?</Text>
+                        <SwitchSelector
+                            options={options}
+                            initial={0}
+                            onPress={value => handleEmotionUpdate(value)}
+                        />
 
                 <VictoryChart  theme={VictoryTheme.material}  style={{ parent: { maxWidth: "100%" } }} scale={{x: 'time'}}
                                width={windowSize.width}
                                domainPadding={{x: 10, y: 25}}
-                               tickCount={4}
+                               tickCount={4}>
+                    {/*
                                containerComponent={
+
+
                     <VictoryZoomContainer responsive={true}
                                           zoomDimension="x"
                                           zoomDomain={zoom}
                                           onZoomDomainChange={zoom}
                     />
-                }>
-                    {/*
+
+
+                }>*/}
+
                     <VictoryScatter
                         style={{data: {fill: 'green'}}}
                         size={7}
                         data={feels} x="dateasdate" y="feelint"
                     />
-                                        <VictoryLine sortKey={2}  data={feels} x="dateasdate" y="feelint" />
+                    <VictoryLine sortKey={2}  data={feels} x="dateasdate" y="feelint" />
 
-                    */}
+
+                    {/*
                     <VictoryBar sortKey={2}  data={feels} x="dateasdate" y="feelint" />
 
-                </VictoryChart>
+                    */}
 
+                </VictoryChart>
+                </Card>
             </View>
         </ThemeProvider>
     );
