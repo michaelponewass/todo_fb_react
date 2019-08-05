@@ -115,7 +115,7 @@ const SwitchSelectorScreen = () => {
             <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'center'}}>
                 <ScrollView>
                 <Card title='Michael'>
-                    <Text h1>Wie ist Deine Stimmung als Zahl ausgedrückt?</Text>
+                    <Text h2>Wie ist Deine Stimmung als Zahl ausgedrückt?</Text>
                         <SwitchSelector
                             options={options}
                             initial={0}
@@ -128,7 +128,6 @@ const SwitchSelectorScreen = () => {
                                tickCount={4}>
                     {/*
                                containerComponent={
-
 
                     <VictoryZoomContainer responsive={true}
                                           zoomDimension="x"
