@@ -3,7 +3,7 @@ import {Card, colors, Header, ThemeProvider} from 'react-native-elements';
 import React, {useEffect, useState} from 'react';
 import SwitchSelector from "react-native-switch-selector";
 import {addEnumber, getCurrentUser, getEnumbers} from './actions/Feelings';
-import {VictoryChart, VictoryLine, VictoryScatter, VictoryTheme} from "victory-native";
+import {VictoryAxis, VictoryChart, VictoryLine, VictoryScatter, VictoryTheme} from "victory-native";
 import TodoScreen from './screens/TodoScreen';
 import {useNavigation} from 'react-navigation-hooks';
 import {createSwitchNavigator, createAppContainer} from 'react-navigation';
@@ -122,12 +122,20 @@ const SwitchSelectorScreen = () => {
                             onPress={value => handleEmotionUpdate(value)}
                         />
 
-                <VictoryChart  theme={VictoryTheme.material}  style={{ parent: { maxWidth: "100%" } }} scale={{x: 'time'}}
+                <VictoryChart  theme={VictoryTheme.material}  style={{ parent: { maxWidth: "100%" },  }} scale={{x: 'time'}}
                                width={windowSize.width}
-                               domainPadding={{x: 10, y: 25}}
                                tickCount={4}>
+
+                    <VictoryAxis
+                        scale="time"
+                        standalone={false}
+                        tickFormat={dateasdate => dateasdate.toLocaleString('de-de')}
+                    />
                     {/*
                                containerComponent={
+
+                        tickFormat={dateasdate => dateasdate.toLocaleString('de-de', { month: 'short' })}
+
 
                     <VictoryZoomContainer responsive={true}
                                           zoomDimension="x"
