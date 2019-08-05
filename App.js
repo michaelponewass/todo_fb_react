@@ -2,10 +2,14 @@ import {Dimensions, Platform, ScrollView, ShadowPropTypesIOS, StyleSheet, Text, 
 import {Card, colors, Header, ThemeProvider} from 'react-native-elements';
 import React, {useEffect, useState} from 'react';
 import SwitchSelector from "react-native-switch-selector";
-import {addEnumber, getEnumbers} from './actions/Feelings';
+import {addEnumber, getCurrentUser, getEnumbers} from './actions/Feelings';
 import {VictoryChart, VictoryLine, VictoryScatter, VictoryTheme} from "victory-native";
 import TodoScreen from './screens/TodoScreen';
-import {createBottomTabNavigator} from 'react-navigation';
+import {useNavigation} from 'react-navigation-hooks';
+import {createSwitchNavigator, createAppContainer} from 'react-navigation';
+import { Firebase } from './lib/firebase';
+import FirebaseLogin from "./FirebaseLogin";
+
 
 const theme = {
     colors: {
@@ -15,6 +19,13 @@ const theme = {
         }),
     },
 };
+
+const LoginScreen = () => {
+        console.log("LoginScreen is called....");
+        return (
+                    <FirebaseLogin login={user => console.logs(user)}/>
+        )
+    }
 
 
 const SwitchSelectorScreen = () => {
@@ -48,8 +59,7 @@ const SwitchSelectorScreen = () => {
     ];
     const [switchValue, setSwitchValue] = useState(0)
     const [feels, setFeels] = useState([])
-
-
+    const [user, setUser] = useState({})
 
     handleEmotionUpdate = (value) => {
         setSwitchValue(value);
@@ -64,6 +74,20 @@ const SwitchSelectorScreen = () => {
             return {...feel, feelint: parseInt(feel.feel), dateasdate: new Date(feel.date)}
         });
     }
+    /**
+     *
+     *
+     */
+    Firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            console.log("benutzer ist eingeloggt: " +JSON.stringify(user));
+        } else {
+            // User is signed in.
+            console.log("benutzer ist NICHT eingeloggt");
+            //Firebase.auth().signInAnonymously();
+            // No user is signed in.
+        }
+    });
 
     useEffect(() => {
         getEnumbers().then((data) => {
@@ -74,15 +98,19 @@ const SwitchSelectorScreen = () => {
             }
         });
     }, []);
+
+
+    const { navigate } = useNavigation();
+
+
     const windowSize = Dimensions.get("window");
     const [zoom, setZoom] = useState({});
     const [brush, setBrush] = useState(0);
-
     return (
         <ThemeProvider theme={theme}>
             <Header
                 centerComponent={{ text: 'Emotionale Nummer', style: { color: '#fff' } }}
-                rightComponent={{ icon: 'add', color: '#fff' }}
+                rightComponent={{ icon: 'add', color: '#fff', onPress: () => {navigate("Login" ) }}}
             />
             <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'center'}}>
                 <ScrollView>
@@ -133,14 +161,20 @@ const SwitchSelectorScreen = () => {
 }
 
 
-const TabNavigator = createBottomTabNavigator({
-    Home: TodoScreen,
-    Switch: SwitchSelectorScreen,
-});
+const AppNavigator = createSwitchNavigator(
+    {
+        Home: SwitchSelectorScreen,
+        Login: LoginScreen
+    },
+    {
+        initialRouteName: "Home"
+    }
+);
 
-//export default createAppContainer(TabNavigator);
+export default createAppContainer(AppNavigator);
 
-export default SwitchSelectorScreen;
+
+//export default SwitchSelectorScreen;
 
 const styles = StyleSheet.create({
     container: {
