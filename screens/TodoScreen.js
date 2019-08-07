@@ -86,4 +86,5 @@ const TodoScreen = () => {
         </ThemeProvider>
     );
 }
+
 export default TodoScreen;

@@ -1,5 +1,5 @@
-import {Dimensions, Platform, ScrollView, ShadowPropTypesIOS, StyleSheet, Text, View} from 'react-native';
-import {Card, colors, Header, ThemeProvider} from 'react-native-elements';
+import {Dimensions, Platform, ScrollView, ShadowPropTypesIOS, StyleSheet, View} from 'react-native';
+import {Card, colors, Header, ThemeProvider, Text} from 'react-native-elements';
 import React, {useEffect, useState} from 'react';
 import SwitchSelector from "react-native-switch-selector";
 import {addEnumber, getCurrentUser, getEnumbers} from './actions/Feelings';
@@ -21,11 +21,18 @@ const theme = {
 };
 
 const LoginScreen = () => {
-        console.log("LoginScreen is called....");
+    const { navigate } = useNavigation();
+
+    console.log("LoginScreen is called....");
+
         return (
-                    <FirebaseLogin login={user => console.logs(user)}/>
-        )
-    }
+            <FirebaseLogin login={user => {
+                console.log(user);
+                navigate('SwitchSelectorScreen');
+            }}/>
+        );
+
+}
 
 
 const SwitchSelectorScreen = () => {
@@ -57,6 +64,19 @@ const SwitchSelectorScreen = () => {
         { label: "10", value: "10" },
 */
     ];
+
+    const OwnCardTitle = () => {
+        if (user.isAnonymous) {
+            return (
+                <Text>Anonym</Text>
+            );
+        } else {
+            return (
+                <Text>{user.email}</Text>
+            )
+        }
+    };
+
     const [switchValue, setSwitchValue] = useState(0)
     const [feels, setFeels] = useState([])
     const [user, setUser] = useState({})
@@ -84,9 +104,10 @@ const SwitchSelectorScreen = () => {
         } else {
             // User is signed in.
             console.log("benutzer ist NICHT eingeloggt");
-            //Firebase.auth().signInAnonymously();
+            Firebase.auth().signInAnonymously();
             // No user is signed in.
         }
+        setUser(user);
     });
 
     useEffect(() => {
@@ -101,8 +122,6 @@ const SwitchSelectorScreen = () => {
 
 
     const { navigate } = useNavigation();
-
-
     const windowSize = Dimensions.get("window");
     const [zoom, setZoom] = useState({});
     const [brush, setBrush] = useState(0);
@@ -114,24 +133,32 @@ const SwitchSelectorScreen = () => {
             />
             <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'center'}}>
                 <ScrollView>
-                <Card title='Michael'>
-                    <Text h2>Wie ist Deine Stimmung als Zahl ausgedrückt?</Text>
+                    <Card title={<OwnCardTitle/>}>
+                        <Text h4 style={{textAlign: 'center'}}>Wie ist Deine Stimmung als Zahl ausgedrückt?</Text>
                         <SwitchSelector
                             options={options}
                             initial={0}
                             onPress={value => handleEmotionUpdate(value)}
                         />
 
-                <VictoryChart  theme={VictoryTheme.material}  style={{ parent: { maxWidth: "100%" },  }} scale={{x: 'time'}}
+                <VictoryChart  theme={VictoryTheme.material}  scale={{x: 'time'}}
                                width={windowSize.width}
                                tickCount={4}>
+
+                    <VictoryAxis dependentAxis
+                                 domain={[0, 6]}
+                                 offsetX={30}
+                                 orientation="left"
+                                 standalone={false} />
 
                     <VictoryAxis
                         scale="time"
                         standalone={false}
-                        tickFormat={dateasdate => dateasdate.toLocaleString('de-de')}
+                        tickFormat={dateasdate => dateasdate.toLocaleString('de-de', { day: 'numeric', month: 'short' })}
                     />
+
                     {/*
+                        tickFormat={dateasdate => dateasdate.toLocaleString('de-de', { month: 'short' })}
                                containerComponent={
 
                         tickFormat={dateasdate => dateasdate.toLocaleString('de-de', { month: 'short' })}
