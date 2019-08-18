@@ -64,6 +64,8 @@ const SwitchSelectorScreen = () => {
         { label: "10", value: "10" },
 */
     ];
+    if (Firebase.auth().currentUser == null) {
+    }
 
     const OwnCardTitle = () => {
         if (user.isAnonymous) {
@@ -94,13 +96,10 @@ const SwitchSelectorScreen = () => {
             return {...feel, feelint: parseInt(feel.feel), dateasdate: new Date(feel.date)}
         });
     }
-    /**
-     *
-     *
-     */
-    Firebase.auth().onAuthStateChanged(function(user) {
+
+    function doAuthChange(user) {
         if (user) {
-            console.log("benutzer ist eingeloggt: " +JSON.stringify(user));
+            console.log("benutzer ist eingeloggt: " + JSON.stringify(user));
         } else {
             // User is signed in.
             console.log("benutzer ist NICHT eingeloggt");
@@ -108,6 +107,14 @@ const SwitchSelectorScreen = () => {
             // No user is signed in.
         }
         setUser(user);
+    }
+
+    /**
+     *
+     *
+     */
+    Firebase.auth().onAuthStateChanged(function(user) {
+        doAuthChange(user);
     });
 
     useEffect(() => {
