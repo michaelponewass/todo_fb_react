@@ -7,7 +7,7 @@ import {VictoryAxis, VictoryChart, VictoryLine, VictoryScatter, VictoryTheme} fr
 import TodoScreen from './screens/TodoScreen';
 import {useNavigation} from 'react-navigation-hooks';
 import {createSwitchNavigator, createAppContainer} from 'react-navigation';
-import { Firebase } from './lib/firebase';
+import {Firebase, FirebaseRef} from './lib/firebase';
 import FirebaseLogin from "./FirebaseLogin";
 
 
@@ -27,7 +27,7 @@ const LoginScreen = () => {
 
         return (
             <FirebaseLogin login={user => {
-                console.log(user);
+                //console.log(user);
                 navigate('SwitchSelectorScreen');
             }}/>
         );
@@ -64,11 +64,15 @@ const SwitchSelectorScreen = () => {
         { label: "10", value: "10" },
 */
     ];
-    if (Firebase.auth().currentUser == null) {
+
+/*
+    if (!user) {
+        doAuthChange(false);
     }
+*/
 
     const OwnCardTitle = () => {
-        if (user.isAnonymous) {
+        if ((!user) || user.isAnonymous) {
             return (
                 <Text>Anonym</Text>
             );
@@ -96,17 +100,20 @@ const SwitchSelectorScreen = () => {
             return {...feel, feelint: parseInt(feel.feel), dateasdate: new Date(feel.date)}
         });
     }
-
     function doAuthChange(user) {
         if (user) {
-            console.log("benutzer ist eingeloggt: " + JSON.stringify(user));
+            //console.log("benutzer ist eingeloggt: " + JSON.stringify(user));
         } else {
             // User is signed in.
-            console.log("benutzer ist NICHT eingeloggt");
-            Firebase.auth().signInAnonymously();
-            // No user is signed in.
+            console.log("benutzer ist wirklich NICHT eingeloggt");
+            let promiseReturn = Firebase.auth().signInAnonymously();
+            promiseReturn.then(function(user) {
+                    console.log("Benutzer ist eingloggt");
+                    setUser(user);
+                }).catch(function(error) {
+                    console.log(error);
+                });
         }
-        setUser(user);
     }
 
     /**
