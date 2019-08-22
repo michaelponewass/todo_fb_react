@@ -1099,6 +1099,24 @@
   resolved "https://registry.yarnpkg.com/@react-native-community/netinfo/-/netinfo-2.0.10.tgz#d28a446352e75754b78509557988359133cdbcca"
   integrity sha512-NrIzyLe0eSbhgMnHl2QdSEhaA7yXh6p9jzMomfUa//hoTXE+xbObGDdiWWSQm2bnXnZJg8XCU3AB9qzvqcuLnA==
 
+"@react-native-firebase/app-types@0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/app-types/-/app-types-0.2.3.tgz#2a81681a2cbe6ca80d818e653f1ad50c32753578"
+  integrity sha512-EKSvTg/bkD8+ugOeLzNDM8IGYlVetAfy8P++yiByHEULDNIPH8azVyYx5n7rUANjAB/4albgoEuTFehN85ZCNw==
+
+"@react-native-firebase/auth@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/auth/-/auth-0.2.3.tgz#8438e50a1fe56ea8470722363849c8d3d22192e3"
+  integrity sha512-IlamVa7EpWxy1GXw8vBZDpBLROcgGUrMjymw6GjP0W036T/elwbJ6LU/DcE+8Wu13MXG8+MCd8+LZSHSDXlxJg==
+  dependencies:
+    "@react-native-firebase/app-types" "0.2.3"
+    "@react-native-firebase/common" "0.2.3"
+
+"@react-native-firebase/common@0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/common/-/common-0.2.3.tgz#0009e3c5de875fa380c3a46ff36d250262bb18a7"
+  integrity sha512-CyvRTD5fODD65ywGThleB+WP7E9wrQv/XB+cy+R8KgEkf3AKDPnI5mjS7t9P8jGLzYZQWy7VU/ynp6f6H/5laQ==
+
 "@react-navigation/core@~3.4.1":
   version "3.4.2"
   resolved "https://registry.yarnpkg.com/@react-navigation/core/-/core-3.4.2.tgz#bec563e94fde40fbab3730cdc97f22afbb2a1498"

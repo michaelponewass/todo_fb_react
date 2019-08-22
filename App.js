@@ -1,14 +1,13 @@
 import {Dimensions, Platform, ScrollView, ShadowPropTypesIOS, StyleSheet, View} from 'react-native';
-import {Card, colors, Header, ThemeProvider, Text} from 'react-native-elements';
+import {Card, colors, Header, Text, ThemeProvider} from 'react-native-elements';
 import React, {useEffect, useState} from 'react';
 import SwitchSelector from "react-native-switch-selector";
 import {addEnumber, getCurrentUser, getEnumbers} from './actions/Feelings';
 import {VictoryAxis, VictoryChart, VictoryLine, VictoryScatter, VictoryTheme} from "victory-native";
-import TodoScreen from './screens/TodoScreen';
 import {useNavigation} from 'react-navigation-hooks';
-import {createSwitchNavigator, createAppContainer} from 'react-navigation';
-import {Firebase, FirebaseRef} from './lib/firebase';
+import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import FirebaseLogin from "./FirebaseLogin";
+import {auth} from "firebase";
 
 
 const theme = {
@@ -21,55 +20,50 @@ const theme = {
 };
 
 const LoginScreen = () => {
-    const { navigate } = useNavigation();
+    const {navigate} = useNavigation();
 
     console.log("LoginScreen is called....");
 
-        return (
-            <FirebaseLogin login={user => {
-                //console.log(user);
-                navigate('SwitchSelectorScreen');
-            }}/>
-        );
+    return (
+        <FirebaseLogin login={user => {
+            //console.log(user);
+            navigate('SwitchSelectorScreen');
+        }}/>
+    );
 
 }
 
 
 const SwitchSelectorScreen = () => {
     const options = [
-/*
+        /*
 
-        { label: "Oh Schreck!", value: "1" },
-        { label: "Schlecht", value: "2" },
-        { label: "Naja", value: "3" },
-        { label: "Ok", value: "4" },
-        { label: "Gut", value: "5" },
-        { label: "Hmm..", value: "6" },
-        { label: "Sehr gut", value: "7" },
-        { label: "Wow", value: "8" },
-        { label: "Großartig", value: "9" },
-        { label: "Unglaublich", value: "10" },
-*/
+                { label: "Oh Schreck!", value: "1" },
+                { label: "Schlecht", value: "2" },
+                { label: "Naja", value: "3" },
+                { label: "Ok", value: "4" },
+                { label: "Gut", value: "5" },
+                { label: "Hmm..", value: "6" },
+                { label: "Sehr gut", value: "7" },
+                { label: "Wow", value: "8" },
+                { label: "Großartig", value: "9" },
+                { label: "Unglaublich", value: "10" },
+        */
 
-        { label: "1", value: "1" },
-        { label: "2", value: "2" },
-        { label: "3", value: "3" },
-        { label: "4", value: "4" },
-        { label: "5", value: "5" },
-        { label: "6", value: "6" },
-/*
-        { label: "7", value: "7" },
-        { label: "8", value: "8" },
-        { label: "9", value: "9" },
-        { label: "10", value: "10" },
-*/
+        {label: "1", value: "1"},
+        {label: "2", value: "2"},
+        {label: "3", value: "3"},
+        {label: "4", value: "4"},
+        {label: "5", value: "5"},
+        {label: "6", value: "6"},
+        /*
+                { label: "7", value: "7" },
+                { label: "8", value: "8" },
+                { label: "9", value: "9" },
+                { label: "10", value: "10" },
+        */
     ];
 
-/*
-    if (!user) {
-        doAuthChange(false);
-    }
-*/
 
     const OwnCardTitle = () => {
         if ((!user) || user.isAnonymous) {
@@ -85,46 +79,56 @@ const SwitchSelectorScreen = () => {
 
     const [switchValue, setSwitchValue] = useState(0)
     const [feels, setFeels] = useState([])
-    const [user, setUser] = useState({})
+    // Set an initilizing state whilst Firebase connects
+    const [initilizing, setInitilizing] = useState(true);
+    const [user, setUser] = useState();
+
+    // Handle user state changes
+    function onAuthStateChanged(user) {
+        setUser(user);
+        if (initilizing) setInitilizing(false);
+    }
+
 
     handleEmotionUpdate = (value) => {
         setSwitchValue(value);
         let currentDate = Date.now();
-        let feel={feel : value, date : currentDate}
+        let feel = {feel: value, date: currentDate}
         setFeels(getConvData([...feels, feel]))
         addEnumber([...feels, feel]);
-        console.log("handleff EmotionUpdate: Number: " + value + " Date: "+currentDate);
+        console.log("handleff EmotionUpdate: Number: " + value + " Date: " + currentDate);
     }
+
     function getConvData(data) {
         return data.map((feel, index, array) => {
             return {...feel, feelint: parseInt(feel.feel), dateasdate: new Date(feel.date)}
         });
     }
-    function doAuthChange(user) {
-        if (user) {
-            //console.log("benutzer ist eingeloggt: " + JSON.stringify(user));
-        } else {
-            // User is signed in.
-            console.log("benutzer ist wirklich NICHT eingeloggt");
-            let promiseReturn = Firebase.auth().signInAnonymously();
-            promiseReturn.then(function(user) {
-                    console.log("Benutzer ist eingloggt");
-                    setUser(user);
-                }).catch(function(error) {
-                    console.log(error);
-                });
+
+    async function loginAnonymouse() {
+        try {
+            await auth().signInAnonymously();
+        } catch (e) {
+            switch (e.code) {
+                case 'auth/operation-not-allowed':
+                    console.log('Enable anonymous in your firebase console.');
+                    break;
+                default:
+                    console.error(e);
+                    break;
+            }
         }
     }
 
-    /**
-     *
-     *
-     */
-    Firebase.auth().onAuthStateChanged(function(user) {
-        doAuthChange(user);
-    });
 
-    useEffect(() => {
+    if (initilizing) return null;
+
+    if (!user) {
+        loginAnonymouse();
+    }
+
+    function getEnumbersFromFirebase() {
+        console.log("user: " + user.uid);
         getEnumbers().then((data) => {
             if (data.length > 0) {
                 const convData = getConvData(data);
@@ -132,18 +136,30 @@ const SwitchSelectorScreen = () => {
                 console.log("data ist: " + JSON.stringify(convData));
             }
         });
+    }
+
+//https://invertase.io/oss/react-native-firebase/v6/auth/quick-start
+
+    useEffect(() => {
+        getEnumbersFromFirebase();
+        const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+        return subscriber; // unsubscribe on unmount
     }, []);
 
 
-    const { navigate } = useNavigation();
+    const {navigate} = useNavigation();
     const windowSize = Dimensions.get("window");
     const [zoom, setZoom] = useState({});
     const [brush, setBrush] = useState(0);
     return (
         <ThemeProvider theme={theme}>
             <Header
-                centerComponent={{ text: 'Emotionale Nummer', style: { color: '#fff' } }}
-                rightComponent={{ icon: 'add', color: '#fff', onPress: () => {navigate("Login" ) }}}
+                centerComponent={{text: 'Emotionale Nummer', style: {color: '#fff'}}}
+                rightComponent={{
+                    icon: 'add', color: '#fff', onPress: () => {
+                        navigate("Login")
+                    }
+                }}
             />
             <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'center'}}>
                 <ScrollView>
@@ -155,23 +171,26 @@ const SwitchSelectorScreen = () => {
                             onPress={value => handleEmotionUpdate(value)}
                         />
 
-                <VictoryChart  theme={VictoryTheme.material}  scale={{x: 'time'}}
-                               width={windowSize.width}
-                               tickCount={4}>
+                        <VictoryChart theme={VictoryTheme.material} scale={{x: 'time'}}
+                                      width={windowSize.width}
+                                      tickCount={4}>
 
-                    <VictoryAxis dependentAxis
-                                 domain={[0, 6]}
-                                 offsetX={30}
-                                 orientation="left"
-                                 standalone={false} />
+                            <VictoryAxis dependentAxis
+                                         domain={[0, 6]}
+                                         offsetX={30}
+                                         orientation="left"
+                                         standalone={false}/>
 
-                    <VictoryAxis
-                        scale="time"
-                        standalone={false}
-                        tickFormat={dateasdate => dateasdate.toLocaleString('de-de', { day: 'numeric', month: 'short' })}
-                    />
+                            <VictoryAxis
+                                scale="time"
+                                standalone={false}
+                                tickFormat={dateasdate => dateasdate.toLocaleString('de-de', {
+                                    day: 'numeric',
+                                    month: 'short'
+                                })}
+                            />
 
-                    {/*
+                            {/*
                         tickFormat={dateasdate => dateasdate.toLocaleString('de-de', { month: 'short' })}
                                containerComponent={
 
@@ -187,21 +206,21 @@ const SwitchSelectorScreen = () => {
 
                 }>*/}
 
-                    <VictoryScatter
-                        style={{data: {fill: 'green'}}}
-                        size={7}
-                        data={feels} x="dateasdate" y="feelint"
-                    />
-                    <VictoryLine sortKey={2}  data={feels} x="dateasdate" y="feelint" />
+                            <VictoryScatter
+                                style={{data: {fill: 'green'}}}
+                                size={7}
+                                data={feels} x="dateasdate" y="feelint"
+                            />
+                            <VictoryLine sortKey={2} data={feels} x="dateasdate" y="feelint"/>
 
 
-                    {/*
+                            {/*
                     <VictoryBar sortKey={2}  data={feels} x="dateasdate" y="feelint" />
 
                     */}
 
-                </VictoryChart>
-                </Card>
+                        </VictoryChart>
+                    </Card>
                 </ScrollView>
             </View>
         </ThemeProvider>

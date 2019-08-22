@@ -5,7 +5,7 @@ export function getEnumbers() {
     if (Firebase === null) return () => new Promise(resolve => resolve());
     let uid = Firebase.auth().uid;
     console.log("uid vor getEnumbers: " + uid);
-    return new Promise((resolve, reject) => FirebaseRef.child('feels').child(uid).once('value')
+    return new Promise((resolve, reject) => FirebaseRef.child('feels').once('value')
         .then((snapshot) => {
             const data = snapshot.val() || [];
             return resolve(data);
@@ -15,7 +15,7 @@ export function getEnumbers() {
 export function addEnumber(feel) {
     if (Firebase === null) return () => new Promise(resolve => resolve());
     let uid = Firebase.auth().uid;
-    return new Promise((resolve, reject) => FirebaseRef.child('feels').child(uid).set(feel)
+    return new Promise((resolve, reject) => FirebaseRef.child('feels').set(feel)
         .then((success) => {
             return resolve(success);
         }).catch(reject)).catch((err) => { throw err.message; });
