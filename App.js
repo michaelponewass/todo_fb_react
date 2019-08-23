@@ -7,7 +7,7 @@ import {VictoryAxis, VictoryChart, VictoryLine, VictoryScatter, VictoryTheme} fr
 import {useNavigation} from 'react-navigation-hooks';
 import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import FirebaseLogin from "./FirebaseLogin";
-import {auth} from "firebase";
+import {Firebase} from "./lib/firebase";
 
 
 const theme = {
@@ -64,7 +64,6 @@ const SwitchSelectorScreen = () => {
         */
     ];
 
-
     const OwnCardTitle = () => {
         if ((!user) || user.isAnonymous) {
             return (
@@ -86,9 +85,10 @@ const SwitchSelectorScreen = () => {
     // Handle user state changes
     function onAuthStateChanged(user) {
         setUser(user);
+        getEnumbersFromFirebase();
+        console.log("user is set onAuthStateChanged. user: "+user.uid);
         if (initilizing) setInitilizing(false);
     }
-
 
     handleEmotionUpdate = (value) => {
         setSwitchValue(value);
@@ -107,7 +107,9 @@ const SwitchSelectorScreen = () => {
 
     async function loginAnonymouse() {
         try {
-            await auth().signInAnonymously();
+            if (Firebase === null) return () => new Promise(resolve => resolve());
+            console.log("loginAnonymouse wird aufgerufen");
+            await Firebase.auth().signInAnonymously();
         } catch (e) {
             switch (e.code) {
                 case 'auth/operation-not-allowed':
@@ -119,17 +121,23 @@ const SwitchSelectorScreen = () => {
             }
         }
     }
-
-
-    if (initilizing) return null;
+/*
 
     if (!user) {
         loginAnonymouse();
     }
 
+    if (user) {
+        console.log("wert von user: " + user.uid);
+    }
+*/
+
     function getEnumbersFromFirebase() {
-        console.log("user: " + user.uid);
-        getEnumbers().then((data) => {
+        console.log("call getEnumbersFromFirebase..." + user);
+        if (!user) {
+            return;
+        }
+        getEnumbers(user.uid).then((data) => {
             if (data.length > 0) {
                 const convData = getConvData(data);
                 setFeels(convData);
@@ -141,11 +149,13 @@ const SwitchSelectorScreen = () => {
 //https://invertase.io/oss/react-native-firebase/v6/auth/quick-start
 
     useEffect(() => {
+        const subscriber = Firebase.auth().onAuthStateChanged(onAuthStateChanged);
+        if (!user) {
+            loginAnonymouse();
+        }
         getEnumbersFromFirebase();
-        const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
         return subscriber; // unsubscribe on unmount
     }, []);
-
 
     const {navigate} = useNavigation();
     const windowSize = Dimensions.get("window");

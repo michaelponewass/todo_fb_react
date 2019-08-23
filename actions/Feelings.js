@@ -1,9 +1,8 @@
 import { Firebase, FirebaseRef } from '../lib/firebase';
 
 
-export function getEnumbers() {
+export function getEnumbers(uid) {
     if (Firebase === null) return () => new Promise(resolve => resolve());
-    let uid = Firebase.auth().uid;
     console.log("uid vor getEnumbers: " + uid);
     return new Promise((resolve, reject) => FirebaseRef.child('feels').once('value')
         .then((snapshot) => {
