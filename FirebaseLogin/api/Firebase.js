@@ -4,25 +4,55 @@ class Firebase {
 
   userLogin = (email, password) => {
     return new Promise(resolve => {
-      firebase.auth().signInWithEmailAndPassword(email, password)
-        .catch(error => {
-          switch (error.code) {
-            case 'auth/invalid-email':
-              console.warn('Invalid email address format.');
-              break;
-            case 'auth/user-not-found':
-            case 'auth/wrong-password':
-              console.warn('Invalid email address or password');
-              break;
-            default:
-              console.warn('Check your internet connection');
-          }
-          resolve(null);
-        }).then(user => {
-        if (user) {
-          resolve(user);
+      let inLoginProcess=false;
+      let currentUser = firebase.auth().currentUser;
+      if (currentUser) {
+        if (currentUser.isAnonymous) {
+          inLoginProcess=true;
+          let credential = firebase.auth.EmailAuthProvider.credential(email, password);
+          currentUser.linkAndRetrieveDataWithCredential(credential)
+              .catch(error => {
+                switch (error.code) {
+                  case 'auth/invalid-email':
+                    console.warn('Invalid email address format.');
+                    break;
+                  case 'auth/user-not-found':
+                  case 'auth/wrong-password':
+                    console.warn('Invalid email address or password');
+                    break;
+                  default:
+                    console.warn('Check your internet connection. Error Code: ' + error.code);
+                }
+                resolve(null);
+              }).then(user => {
+            if (user) {
+              resolve(user);
+            }
+          });
+
         }
-      });
+      }
+      if (!inLoginProcess) {
+        firebase.auth().signInWithEmailAndPassword(email, password)
+            .catch(error => {
+              switch (error.code) {
+                case 'auth/invalid-email':
+                  console.warn('Invalid email address format.');
+                  break;
+                case 'auth/user-not-found':
+                case 'auth/wrong-password':
+                  console.warn('Invalid email address or password');
+                  break;
+                default:
+                  console.warn('Check your internet connection');
+              }
+              resolve(null);
+            }).then(user => {
+          if (user) {
+            resolve(user);
+          }
+        });
+      }
     })
   };
 

@@ -10,6 +10,10 @@ import FirebaseLogin from "./FirebaseLogin";
 import {Firebase} from "./lib/firebase";
 
 
+import { createStore, useStore } from 'react-hookstore';
+
+createStore('userStore', null);
+
 const theme = {
     colors: {
         ...Platform.select({
@@ -18,15 +22,24 @@ const theme = {
         }),
     },
 };
-
+/**
+ *
+ * https://github.com/venits/react-native-firebase-login-screen
+ *
+ *
+ * @returns {*}
+ * @constructor
+ */
 const LoginScreen = () => {
     const {navigate} = useNavigation();
+    const [ globalUser, setGlobalUser ] = useStore('userStore');
 
     console.log("LoginScreen is called....");
 
     return (
         <FirebaseLogin login={user => {
             //console.log(user);
+            setGlobalUser(user);
             navigate('SwitchSelectorScreen');
         }}/>
     );
@@ -65,14 +78,14 @@ const SwitchSelectorScreen = () => {
     ];
 
     const OwnCardTitle = () => {
-        if ((!user) || user.isAnonymous) {
+        if ((!globalUser) || globalUser.isAnonymous) {
             return (
                 <Text>Anonym</Text>
             );
         } else {
             return (
-                <Text>{user.email}</Text>
-            )
+                <Text>{globalUser.email}</Text>
+            );
         }
     };
 
@@ -81,21 +94,26 @@ const SwitchSelectorScreen = () => {
     // Set an initilizing state whilst Firebase connects
     const [initilizing, setInitilizing] = useState(true);
     const [user, setUser] = useState();
+    const [ globalUser, setGlobalUser ] = useStore('userStore');
 
     // Handle user state changes
     function onAuthStateChanged(user) {
-        setUser(user);
-        getEnumbersFromFirebase();
+        setGlobalUser(user);
         console.log("user is set onAuthStateChanged. user: "+user.uid);
+        getEnumbersFromFirebase();
         if (initilizing) setInitilizing(false);
     }
 
     handleEmotionUpdate = (value) => {
+        let user = Firebase.auth().currentUser;
+        if (!user) {
+            return;
+        }
         setSwitchValue(value);
         let currentDate = Date.now();
         let feel = {feel: value, date: currentDate}
         setFeels(getConvData([...feels, feel]))
-        addEnumber([...feels, feel]);
+        addEnumber([...feels, feel], user.uid);
         console.log("handleff EmotionUpdate: Number: " + value + " Date: " + currentDate);
     }
 
@@ -121,22 +139,13 @@ const SwitchSelectorScreen = () => {
             }
         }
     }
-/*
-
-    if (!user) {
-        loginAnonymouse();
-    }
-
-    if (user) {
-        console.log("wert von user: " + user.uid);
-    }
-*/
 
     function getEnumbersFromFirebase() {
-        console.log("call getEnumbersFromFirebase..." + user);
+        let user = Firebase.auth().currentUser;
         if (!user) {
             return;
         }
+        console.log("call getEnumbersFromFirebase..." + user.uid);
         getEnumbers(user.uid).then((data) => {
             if (data.length > 0) {
                 const convData = getConvData(data);
@@ -145,7 +154,7 @@ const SwitchSelectorScreen = () => {
             }
         });
     }
-
+//
 //https://invertase.io/oss/react-native-firebase/v6/auth/quick-start
 
     useEffect(() => {
@@ -154,7 +163,12 @@ const SwitchSelectorScreen = () => {
             loginAnonymouse();
         }
         getEnumbersFromFirebase();
-        return subscriber; // unsubscribe on unmount
+/*
+        return () => {
+            Firebase.auth().onAuthStateChanged(null);
+        };
+*/
+        return subscriber;
     }, []);
 
     const {navigate} = useNavigation();
