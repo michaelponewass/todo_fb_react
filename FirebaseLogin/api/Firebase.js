@@ -9,6 +9,7 @@ class Firebase {
       if (currentUser) {
         if (currentUser.isAnonymous) {
           inLoginProcess=true;
+          console.log("user is anonymouse");
           let credential = firebase.auth.EmailAuthProvider.credential(email, password);
           currentUser.linkAndRetrieveDataWithCredential(credential)
               .catch(error => {
@@ -24,9 +25,10 @@ class Firebase {
                     console.warn('Check your internet connection. Error Code: ' + error.code);
                 }
                 resolve(null);
-              }).then(user => {
-            if (user) {
-              resolve(user);
+              }).then(usercredential => {
+            if (usercredential) {
+              console.log("usercredential is called. user: " + user.email);
+              resolve(usercredential.user);
             }
           });
 
