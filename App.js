@@ -38,9 +38,9 @@ const LoginScreen = () => {
 
     return (
         <FirebaseLogin login={user => {
-            //console.log(user);
+            console.log(user);
             setGlobalUser(user);
-            navigate('SwitchSelectorScreen');
+            navigate('Home');
         }}/>
     );
 

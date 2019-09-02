@@ -4,6 +4,7 @@ class Firebase {
 
   userLogin = (email, password) => {
     return new Promise(resolve => {
+/*
       let inLoginProcess=false;
       let currentUser = firebase.auth().currentUser;
       if (currentUser) {
@@ -34,7 +35,8 @@ class Firebase {
 
         }
       }
-      if (!inLoginProcess) {
+*/
+//      if (!inLoginProcess) {
         firebase.auth().signInWithEmailAndPassword(email, password)
             .catch(error => {
               switch (error.code) {
@@ -54,9 +56,9 @@ class Firebase {
             resolve(user);
           }
         });
-      }
+ //     }
     })
-  };
+ };
 
   createFirebaseAccount = (name, email, password) => {
     return new Promise(resolve => {
