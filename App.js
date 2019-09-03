@@ -8,9 +8,7 @@ import {useNavigation} from 'react-navigation-hooks';
 import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import FirebaseLogin from "./FirebaseLogin";
 import {Firebase} from "./lib/firebase";
-
-
-import { createStore, useStore } from 'react-hookstore';
+import {createStore, useStore} from 'react-hookstore';
 
 createStore('userStore', null);
 
@@ -39,7 +37,7 @@ const LoginScreen = () => {
     return (
         <FirebaseLogin login={user => {
             console.log(user);
-            setGlobalUser(user);
+            setGlobalUser(user.user);
             navigate('Home');
         }}/>
     );
@@ -93,7 +91,6 @@ const SwitchSelectorScreen = () => {
     const [feels, setFeels] = useState([])
     // Set an initilizing state whilst Firebase connects
     const [initilizing, setInitilizing] = useState(true);
-    const [user, setUser] = useState();
     const [ globalUser, setGlobalUser ] = useStore('userStore');
 
     // Handle user state changes
@@ -105,15 +102,14 @@ const SwitchSelectorScreen = () => {
     }
 
     handleEmotionUpdate = (value) => {
-        let user = Firebase.auth().currentUser;
-        if (!user) {
+        if (!globalUser) {
             return;
         }
         setSwitchValue(value);
         let currentDate = Date.now();
         let feel = {feel: value, date: currentDate}
         setFeels(getConvData([...feels, feel]))
-        addEnumber([...feels, feel], user.uid);
+        addEnumber([...feels, feel], globalUser.uid);
         console.log("handleff EmotionUpdate: Number: " + value + " Date: " + currentDate);
     }
 
@@ -141,12 +137,11 @@ const SwitchSelectorScreen = () => {
     }
 
     function getEnumbersFromFirebase() {
-        let user = Firebase.auth().currentUser;
-        if (!user) {
+        if (!globalUser) {
             return;
         }
-        console.log("call getEnumbersFromFirebase..." + user.uid);
-        getEnumbers(user.uid).then((data) => {
+        console.log("call getEnumbersFromFirebase..." + globalUser.uid);
+        getEnumbers(globalUser.uid).then((data) => {
             if (data.length > 0) {
                 const convData = getConvData(data);
                 setFeels(convData);
@@ -159,10 +154,10 @@ const SwitchSelectorScreen = () => {
 
     useEffect(() => {
         const subscriber = Firebase.auth().onAuthStateChanged(onAuthStateChanged);
-        if (!user) {
+        if (!globalUser) {
             loginAnonymouse();
-        }
-        getEnumbersFromFirebase();
+        } else
+          getEnumbersFromFirebase();
 /*
         return () => {
             Firebase.auth().onAuthStateChanged(null);
@@ -220,13 +215,11 @@ const SwitchSelectorScreen = () => {
 
                         tickFormat={dateasdate => dateasdate.toLocaleString('de-de', { month: 'short' })}
 
-
                     <VictoryZoomContainer responsive={true}
                                           zoomDimension="x"
                                           zoomDomain={zoom}
                                           onZoomDomainChange={zoom}
                     />
-
 
                 }>*/}
 
