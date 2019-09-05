@@ -9,13 +9,18 @@ import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import FirebaseLogin from "./FirebaseLogin";
 import {Firebase} from "./lib/firebase";
 import {createStore, useStore} from 'react-hookstore';
+import { Rating, AirbnbRating } from 'react-native-elements';
+
 
 createStore('userStore', null);
 
 const theme = {
+
     colors: {
         ...Platform.select({
-            default: colors.platform.android,
+            default: {
+                'primary' : '#fbc02d',
+            },
             ios: colors.platform.ios,
         }),
     },
@@ -60,6 +65,15 @@ const SwitchSelectorScreen = () => {
                 { label: "Großartig", value: "9" },
                 { label: "Unglaublich", value: "10" },
         */
+        { label: "Schlecht", value: "1" },
+        { label: "Ok", value: "2" },
+        { label: "Hmm..", value: "3" },
+        { label: "Sehr gut", value: "4" },
+        { label: "Wow", value: "5" },
+        { label: "Unglaublich", value: "6" },
+/*
+
+ reviews={["Bad", "OK", "Hmm...", "Very Good", "Wow", "Amazing"]}
 
         {label: "1", value: "1"},
         {label: "2", value: "2"},
@@ -67,6 +81,8 @@ const SwitchSelectorScreen = () => {
         {label: "4", value: "4"},
         {label: "5", value: "5"},
         {label: "6", value: "6"},
+*/
+
         /*
                 { label: "7", value: "7" },
                 { label: "8", value: "8" },
@@ -78,16 +94,15 @@ const SwitchSelectorScreen = () => {
     const OwnCardTitle = () => {
         if ((!globalUser) || globalUser.isAnonymous) {
             return (
-                <Text>Anonym</Text>
+                <Text>ICH</Text>
             );
         } else {
             return (
-                <Text>{globalUser.email}</Text>
+                <Text style={{textAlign:'center'}}>{globalUser.email.toUpperCase()}</Text>
             );
         }
     };
 
-    const [switchValue, setSwitchValue] = useState(0)
     const [feels, setFeels] = useState([])
     // Set an initilizing state whilst Firebase connects
     const [initilizing, setInitilizing] = useState(true);
@@ -105,7 +120,6 @@ const SwitchSelectorScreen = () => {
         if (!globalUser) {
             return;
         }
-        setSwitchValue(value);
         let currentDate = Date.now();
         let feel = {feel: value, date: currentDate}
         setFeels(getConvData([...feels, feel]))
@@ -162,15 +176,17 @@ const SwitchSelectorScreen = () => {
             getEnumbersFromFirebase();
         }
         return () => {
-            Firebase.auth().onAuthStateChanged(null);
+            subscriber();
         };
     }, [globalUser]);
+
 
     const {navigate} = useNavigation();
     const windowSize = Dimensions.get("window");
     const [zoom, setZoom] = useState({});
     const [brush, setBrush] = useState(0);
     return (
+
         <ThemeProvider theme={theme}>
             <Header
                 centerComponent={{text: 'Emotionale Nummer', style: {color: '#fff'}}}
@@ -182,13 +198,25 @@ const SwitchSelectorScreen = () => {
             />
             <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'center'}}>
                 <ScrollView>
-                    <Card title={<OwnCardTitle/>}>
-                        <Text h4 style={{textAlign: 'center'}}>Wie ist Deine Stimmung als Zahl ausgedrückt?</Text>
+                    <Card title={<OwnCardTitle/>} titleStyle={{color: 'red',}} containerStyle={{padding: 10}}>
+                        <Text h4 style={{textAlign: 'center', padding: 15}}>Wie geht's Dir?</Text>
+
+                        <AirbnbRating
+                            count={6}
+                            reviews={["Schlecht", "OK", "Hmm...", "Sehr gut", "Wow", "Unglaublich"]}
+                            defaultRating={3}
+                            size={40}
+                            onFinishRating={value => handleEmotionUpdate(value)}
+                        />
+
+                        {/*
                         <SwitchSelector
                             options={options}
-                            initial={0}
+                            initial={2}
+                            bold={true}
                             onPress={value => handleEmotionUpdate(value)}
                         />
+                         */}
 
                         <VictoryChart theme={VictoryTheme.material} scale={{x: 'time'}}
                                       width={windowSize.width}
