@@ -95,10 +95,10 @@ const SwitchSelectorScreen = () => {
 
     // Handle user state changes
     function onAuthStateChanged(user) {
-        setGlobalUser(user);
-        console.log("user is set onAuthStateChanged. user: "+user.uid);
-        getEnumbersFromFirebase();
         if (initilizing) setInitilizing(false);
+        setGlobalUser(user);
+        getEnumbersFromFirebase();
+        console.log("user is set onAuthStateChanged. user: "+user.uid);
     }
 
     handleEmotionUpdate = (value) => {
@@ -135,7 +135,6 @@ const SwitchSelectorScreen = () => {
             }
         }
     }
-
     function getEnumbersFromFirebase() {
         if (!globalUser) {
             return;
@@ -154,17 +153,18 @@ const SwitchSelectorScreen = () => {
 
     useEffect(() => {
         const subscriber = Firebase.auth().onAuthStateChanged(onAuthStateChanged);
+        if (initilizing) {
+            return;
+        }
         if (!globalUser) {
             loginAnonymouse();
-        } else
-          getEnumbersFromFirebase();
-/*
+        } else{
+            getEnumbersFromFirebase();
+        }
         return () => {
             Firebase.auth().onAuthStateChanged(null);
         };
-*/
-        return subscriber;
-    }, []);
+    }, [globalUser]);
 
     const {navigate} = useNavigation();
     const windowSize = Dimensions.get("window");
