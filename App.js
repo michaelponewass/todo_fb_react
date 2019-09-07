@@ -3,6 +3,7 @@ import {Card, colors, Header, Text, ThemeProvider} from 'react-native-elements';
 import React, {useEffect, useState} from 'react';
 import SwitchSelector from "react-native-switch-selector";
 import {addEnumber, getCurrentUser, getEnumbers} from './actions/Feelings';
+import {getUsers} from './actions/Users';
 import {VictoryAxis, VictoryChart, VictoryLine, VictoryScatter, VictoryTheme} from "victory-native";
 import {useNavigation} from 'react-navigation-hooks';
 import {createAppContainer, createSwitchNavigator} from 'react-navigation';
@@ -110,6 +111,10 @@ const SwitchSelectorScreen = () => {
 
     // Handle user state changes
     function onAuthStateChanged(user) {
+        // happen, if i delete a user on firebase console
+        if (user==null) {
+            return;
+        }
         if (initilizing) setInitilizing(false);
         setGlobalUser(user);
         getEnumbersFromFirebase();
@@ -153,12 +158,17 @@ const SwitchSelectorScreen = () => {
         if (!globalUser) {
             return;
         }
+        getUsers().then( (userdata) => {
+            console.log("user sind: " + JSON.stringify(userdata));
+            }
+        )
+
         console.log("call getEnumbersFromFirebase..." + globalUser.uid);
         getEnumbers(globalUser.uid).then((data) => {
             if (data.length > 0) {
                 const convData = getConvData(data);
                 setFeels(convData);
-                console.log("data ist: " + JSON.stringify(convData));
+                //console.log("data ist: " + JSON.stringify(convData));
             }
         });
     }

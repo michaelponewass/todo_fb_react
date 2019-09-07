@@ -2,6 +2,7 @@ import firebase from "firebase";
 
 class Firebase {
 
+
   userLogin = (email, password) => {
     return new Promise(resolve => {
 /*
@@ -60,6 +61,35 @@ class Firebase {
     })
  };
 
+  /**
+   * Get this User's Details
+   */
+  getUserData = (dispatch) => {
+    const UID = (
+        FirebaseRef
+        && Firebase
+        && Firebase.auth()
+        && Firebase.auth().currentUser
+        && Firebase.auth().currentUser.uid
+    ) ? Firebase.auth().currentUser.uid : null;
+
+    if (!UID) return false;
+
+    const ref = FirebaseRef.child(`users/${UID}`);
+
+    return ref.on('value', (snapshot) => {
+      const userData = snapshot.val() || [];
+
+      return dispatch({ type: 'USER_DETAILS_UPDATE', data: userData });
+    });
+  }
+  /**
+   * create firebase Account with extra data
+   * @param name
+   * @param email
+   * @param password
+   * @returns {Promise<any>}
+   */
   createFirebaseAccount = (name, email, password) => {
     return new Promise(resolve => {
       firebase.auth().createUserWithEmailAndPassword(email, password).catch(error => {
@@ -77,12 +107,14 @@ class Firebase {
             console.warn('Check your internet connection');
         }
         resolve(false);
-      }).then(info => {
-        if (info) {
-          firebase.auth().currentUser.updateProfile({
-            displayName: name
-          });
-          resolve(true);
+      }).then((res) => {
+          // Send user details to Firebase database
+          if (res && res.user.uid) {
+            firebase.database().ref().child('users').child(res.user.uid).set({
+              name,
+              signedUp: firebase.database.ServerValue.TIMESTAMP,
+              lastLoggedIn: firebase.database.ServerValue.TIMESTAMP,
+            }).then(resolve);
         }
       });
     });
