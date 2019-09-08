@@ -1,5 +1,5 @@
 import {Dimensions, Platform, ScrollView, ShadowPropTypesIOS, StyleSheet, View} from 'react-native';
-import {Card, colors, Header, Text, ThemeProvider} from 'react-native-elements';
+import {Card, colors, Header, Overlay, Text, ThemeProvider} from 'react-native-elements';
 import React, {useEffect, useState} from 'react';
 import SwitchSelector from "react-native-switch-selector";
 import {addEnumber, getCurrentUser, getEnumbers} from './actions/Feelings';
@@ -11,7 +11,8 @@ import FirebaseLogin from "./FirebaseLogin";
 import {Firebase} from "./lib/firebase";
 import {createStore, useStore} from 'react-hookstore';
 import { Rating, AirbnbRating } from 'react-native-elements';
-
+import { FloatingAction } from "react-native-floating-action";
+import UserAddOverlay from "./screens/UserAddOverlayScreen";
 
 createStore('userStore', null);
 
@@ -191,6 +192,15 @@ const SwitchSelectorScreen = () => {
     }, [globalUser]);
 
 
+    const floatingActions = [
+        {
+            text: "Benutzer hinzufügen",
+            name: "bt_add_user",
+            position: 1
+        }
+    ];
+
+
     const {navigate} = useNavigation();
     const windowSize = Dimensions.get("window");
     const [zoom, setZoom] = useState({});
@@ -278,15 +288,26 @@ const SwitchSelectorScreen = () => {
                     </Card>
                 </ScrollView>
             </View>
+
+            <FloatingAction
+                actions={floatingActions
+                }
+                position="right"
+                onPressItem={name => {
+                    console.log("onPressItem was pressend ${name} ");
+                    navigate('AddUser');
+                }}
+            />
         </ThemeProvider>
     );
-}
+};
 
 
 const AppNavigator = createSwitchNavigator(
     {
         Home: SwitchSelectorScreen,
-        Login: LoginScreen
+        Login: LoginScreen,
+        AddUser: UserAddOverlay
     },
     {
         initialRouteName: "Home"
