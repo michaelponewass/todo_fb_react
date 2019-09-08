@@ -17,13 +17,10 @@ import UserAddOverlay from "./screens/UserAddOverlayScreen";
 createStore('userStore', null);
 
 const theme = {
-
     colors: {
         ...Platform.select({
-            default: {
-                'primary' : '#fbc02d',
-            },
-            ios: colors.platform.ios,
+            android: colors.platform.android,
+            ios: colors.platform.ios
         }),
     },
 };
@@ -76,21 +73,8 @@ const SwitchSelectorScreen = () => {
 /*
 
  reviews={["Bad", "OK", "Hmm...", "Very Good", "Wow", "Amazing"]}
-
-        {label: "1", value: "1"},
-        {label: "2", value: "2"},
-        {label: "3", value: "3"},
-        {label: "4", value: "4"},
-        {label: "5", value: "5"},
-        {label: "6", value: "6"},
 */
 
-        /*
-                { label: "7", value: "7" },
-                { label: "8", value: "8" },
-                { label: "9", value: "9" },
-                { label: "10", value: "10" },
-        */
     ];
 
     const OwnCardTitle = () => {
@@ -316,50 +300,3 @@ const AppNavigator = createSwitchNavigator(
 
 export default createAppContainer(AppNavigator);
 
-
-//export default SwitchSelectorScreen;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-    },
-    textInput: {
-        height: 20,
-        flex: 1,
-        minHeight: '7%',
-        marginTop: '5%',
-        fontSize: 25,
-        fontWeight: 'bold',
-        color: 'black',
-        paddingLeft: 10
-    },
-    taskWrapper: {
-        marginTop: '5%',
-        flexDirection: 'row',
-        // alignItems: 'baseline',
-        borderColor: '#D0D0D0',
-        borderBottomWidth: 0.5,
-        width: '100%',
-        alignItems: 'stretch',
-        minHeight: 40,
-    },
-    task: {
-        paddingBottom: 20,
-        paddingLeft: 10,
-        paddingTop: 6,
-        borderColor: 'black',
-        borderBottomWidth: 1,
-        fontSize: 17,
-        fontWeight: 'bold',
-        color: 'black',
-    },
-    textInputContainer: {
-        flexDirection: 'row',
-        alignItems: 'baseline',
-        borderColor: 'rgb(222,222,222)',
-        borderBottomWidth: 1,
-        paddingRight: 10,
-        paddingBottom: 5
-    }
-});
