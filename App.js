@@ -88,6 +88,13 @@ const SwitchSelectorScreen = () => {
             );
         }
     };
+    evaluateTickFormat = () => {
+        return dateasdate => dateasdate.toLocaleString('de-de', {
+            day: '2-digit',
+            month: 'short'
+        })
+    };
+
 
     const [feels, setFeels] = useState([])
     // Set an initilizing state whilst Firebase connects
@@ -117,6 +124,17 @@ const SwitchSelectorScreen = () => {
         console.log("handleff EmotionUpdate: Number: " + value + " Date: " + currentDate);
     }
 
+    function findMinMax(arr) {
+        let min = arr[0].dateasdate, max = arr[0].dateasdate;
+
+        for (let i = 1, len=arr.length; i < len; i++) {
+            let v = arr[i].dateasdate;
+            min = (v < min) ? v : min;
+            max = (v > max) ? v : max;
+        }
+
+        return [min, max];
+    }
     function getConvData(data) {
         return data.map((feel, index, array) => {
             return {...feel, feelint: parseInt(feel.feel), dateasdate: new Date(feel.date)}
@@ -153,6 +171,8 @@ const SwitchSelectorScreen = () => {
             if (data.length > 0) {
                 const convData = getConvData(data);
                 setFeels(convData);
+                //@todo: Ermitteln min und max und Datum der X Axe setzen.
+                console.log("min u. Max Values: " + JSON.stringify(findMinMax(feels)));
                 //console.log("data ist: " + JSON.stringify(convData));
             }
         });
@@ -235,10 +255,7 @@ const SwitchSelectorScreen = () => {
                             <VictoryAxis
                                 scale="time"
                                 standalone={false}
-                                tickFormat={dateasdate => dateasdate.toLocaleString('de-de', {
-                                    day: 'numeric',
-                                    month: 'short'
-                                })}
+                                tickFormat={evaluateTickFormat()}
                             />
 
                             {/*
