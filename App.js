@@ -28,7 +28,6 @@ const theme = {
  *
  * https://github.com/venits/react-native-firebase-login-screen
  *
- *
  * @returns {*}
  * @constructor
  */
@@ -95,11 +94,12 @@ const SwitchSelectorScreen = () => {
         })
     };
 
-
     const [feels, setFeels] = useState([])
     // Set an initilizing state whilst Firebase connects
     const [initilizing, setInitilizing] = useState(true);
     const [ globalUser, setGlobalUser ] = useStore('userStore');
+    const [ globalUsers, setGlobalUsers ] = useStore('userStore');
+
 
     // Handle user state changes
     function onAuthStateChanged(user) {
@@ -162,7 +162,10 @@ const SwitchSelectorScreen = () => {
             return;
         }
         getUsers().then( (userdata) => {
-            console.log("user sind: " + JSON.stringify(userdata));
+            if (userdata.length > 0) {
+                setGlobalUsers(userdata);
+                //console.log("user sind: " + JSON.stringify(userdata));
+                }
             }
         )
 
@@ -172,7 +175,7 @@ const SwitchSelectorScreen = () => {
                 const convData = getConvData(data);
                 setFeels(convData);
                 //@todo: Ermitteln min und max und Datum der X Axe setzen.
-                console.log("min u. Max Values: " + JSON.stringify(findMinMax(feels)));
+                //console.log("min u. Max Values: " + JSON.stringify(findMinMax(feels)));
                 //console.log("data ist: " + JSON.stringify(convData));
             }
         });
