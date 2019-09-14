@@ -157,17 +157,18 @@ const SwitchSelectorScreen = () => {
             }
         }
     }
+
     function getEnumbersFromFirebase() {
         if (!globalUser) {
             return;
         }
-        getUsers().then( (userdata) => {
-            if (userdata.length > 0) {
-                setGlobalUsers(userdata);
-                //console.log("user sind: " + JSON.stringify(userdata));
+        getUsers().then((userdata) => {
+                if (userdata.length > 0) {
+                    setGlobalUsers(userdata);
+                    console.log("setGlobalUsers done:: " + JSON.stringify(userdata));
                 }
             }
-        )
+        );
 
         console.log("call getEnumbersFromFirebase..." + globalUser.uid);
         getEnumbers(globalUser.uid).then((data) => {
@@ -181,7 +182,6 @@ const SwitchSelectorScreen = () => {
         });
     }
 //
-//https://invertase.io/oss/react-native-firebase/v6/auth/quick-start
 
     useEffect(() => {
         const subscriber = Firebase.auth().onAuthStateChanged(onAuthStateChanged);
