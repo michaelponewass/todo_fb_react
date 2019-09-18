@@ -15,6 +15,8 @@ import { FloatingAction } from "react-native-floating-action";
 import UserAddOverlay from "./screens/UserAddOverlayScreen";
 
 createStore('userStore', null);
+createStore('globalUsersStore', null);
+
 
 const theme = {
     colors: {
@@ -25,7 +27,7 @@ const theme = {
     },
 };
 /**
- *
+ * mew reload
  * https://github.com/venits/react-native-firebase-login-screen
  *
  * @returns {*}
@@ -98,7 +100,7 @@ const SwitchSelectorScreen = () => {
     // Set an initilizing state whilst Firebase connects
     const [initilizing, setInitilizing] = useState(true);
     const [ globalUser, setGlobalUser ] = useStore('userStore');
-    const [ globalUsers, setGlobalUsers ] = useStore('userStore');
+    const [ globalUsers, setGlobalUsers ] = useStore('globalUsersStore');
 
 
     // Handle user state changes
@@ -107,9 +109,9 @@ const SwitchSelectorScreen = () => {
         if (user==null) {
             return;
         }
-        if (initilizing) setInitilizing(false);
         setGlobalUser(user);
         getEnumbersFromFirebase();
+        if (initilizing) setInitilizing(false);
         console.log("user is set onAuthStateChanged. user: "+user.uid);
     }
 
@@ -162,11 +164,11 @@ const SwitchSelectorScreen = () => {
         if (!globalUser) {
             return;
         }
-        getUsers().then((userdata) => {
-                if (userdata.length > 0) {
+         getUsers().then((userdata) => {
+              //  if (userdata.length > 0) {
                     setGlobalUsers(userdata);
                     console.log("setGlobalUsers done:: " + JSON.stringify(userdata));
-                }
+              //  }
             }
         );
 
@@ -194,8 +196,10 @@ const SwitchSelectorScreen = () => {
             getEnumbersFromFirebase();
         }
         return () => {
+            setInitilizing(false);
             subscriber();
-        };
+        }
+
     }, [globalUser]);
 
 
@@ -298,7 +302,7 @@ const SwitchSelectorScreen = () => {
                 }
                 position="right"
                 onPressItem={name => {
-                    console.log("onPressItem was pressend ${name} ");
+                    console.log("onPressItem was pressend: "+name);
                     navigate('AddUser');
                 }}
             />

@@ -1,19 +1,18 @@
 import {List, Button, ListItem, Overlay, Text, ThemeProvider} from "react-native-elements";
 import React, {useEffect, useState} from 'react';
 import {useNavigation} from 'react-navigation-hooks';
-import {View} from "react-native";
-import {useStore} from "react-hookstore";
+import {useStore} from 'react-hookstore';
 
 const UserAddOverlay = () => {
     const [visible, setVisible] = useState(true);
-    const [ globalUsers, setGlobalUsers ] = useStore('userStore');
+    const [ globalUsers] = useStore('globalUsersStore');
     const {navigate} = useNavigation();
 
     useEffect(() => {
         if (!visible) {
             navigate("Home");
-            }
-        });
+        }
+    });
 
     const list = [
         {
@@ -61,7 +60,8 @@ const UserAddOverlay = () => {
 
         </Overlay>
 
-);
+    );
 
 };
+
 export default UserAddOverlay;
