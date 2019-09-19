@@ -27,12 +27,14 @@ const UserAddOverlay = () => {
         },
     ];
 
+    let userList = Object.entries(globalUsers);
+
     /**
      *
-     * @param l
+     * @param userId
      */
-    function addCardToMainScreen(l) {
-
+    function addCardToMainScreen(userId) {
+        console.log("user id ist: ".userId);
 
     }
 
@@ -41,11 +43,13 @@ const UserAddOverlay = () => {
                  onBackdropPress={() => setVisible(false)}>
             <Text>Hello from Overlay!</Text>
             {
-                globalUsers.map((l, i) => (
+                userList.map(item => (
                     <ListItem
-                        key={i}
-                        title={l.name}
-                        onPress={() => {addCardToMainScreen(l)}}
+                        key={item[0]}
+                        title={item[1].name}
+                        onPress={() => {
+                           console.log("userId: "+item[0]);
+                        }}
                         bottomDivider
                     />
                 ))
