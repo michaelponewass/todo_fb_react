@@ -229,7 +229,7 @@ const SwitchSelectorScreen = () => {
             />
             <View style={{flex: 1, alignItems: 'stretch', justifyContent: 'center'}}>
                 <ScrollView>
-                    <Card title={<OwnCardTitle/>} titleStyle={{color: 'red',}} containerStyle={{padding: 10}}>
+                    <Card title={<OwnCardTitle/>} titleStyle={{color: 'red'}} containerStyle={{padding: 10}}>
                         <Text h4 style={{textAlign: 'center', padding: 15}}>Wie geht's Dir?</Text>
 
                         <AirbnbRating
