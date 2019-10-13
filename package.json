@@ -23,7 +23,6 @@
     "react-native-web": "^0.11.4",
     "react-navigation": "^3.11.0",
     "react-navigation-hooks": "^1.0.1",
-    "save-dev": "^2.0.0",
     "victory-native": "^32.0.2"
   },
   "devDependencies": {
